@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">录音工具</string>
+    <string name="menu_share">分享</string>
+    <string name="menu_settings">设置</string>
+    <string name="menu_about">关于</string>
+    <string name="menu_help">帮助</string>
+</resources>

@@ -1,0 +1,29 @@
+pluginManagement {
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url 'https://maven.aliyun.com/repository/public/' } // 阿里云镜像
+        maven { url 'https://mirrors.huaweicloud.com/repository/maven/' } // 华为云镜像
+        maven { url 'https://mirrors.tencent.com/nexus/repository/maven-public/' } // 腾讯云镜像
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://maven.aliyun.com/repository/public/' } // 阿里云镜像
+        maven { url 'https://mirrors.huaweicloud.com/repository/maven/' } // 华为云镜像
+        maven { url 'https://mirrors.tencent.com/nexus/repository/maven-public/' } // 腾讯云镜像
+    }
+}
+
+rootProject.name = "AndroidAudioPlayer"
+include ':app'
