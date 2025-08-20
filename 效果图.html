@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>录音应用 - Android风格</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        header {
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #60a5fa, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        .recorder-section {
+            padding: 30px 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .visualizer {
+            width: 100%;
+            height: 150px;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 18px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            width: 100%;
+        }
+
+        .bar {
+            width: 4px;
+            height: 20px;
+            background: #38bdf8;
+            margin: 0 3px;
+            border-radius: 2px;
+            animation: wave 1.2s infinite ease-in-out;
+        }
+
+        .bar:nth-child(2) { animation-delay: 0.1s; }
+        .bar:nth-child(3) { animation-delay: 0.2s; }
+        .bar:nth-child(4) { animation-delay: 0.3s; }
+        .bar:nth-child(5) { animation-delay: 0.4s; }
+        .bar:nth-child(6) { animation-delay: 0.5s; }
+        .bar:nth-child(7) { animation-delay: 0.6s; }
+        .bar:nth-child(8) { animation-delay: 0.7s; }
+        .bar:nth-child(9) { animation-delay: 0.8s; }
+        .bar:nth-child(10) { animation-delay: 0.9s; }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(0.3); }
+            50% { transform: scaleY(1); }
+        }
+
+        .timer {
+            position: absolute;
+            bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #60a5fa;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .recording-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            color: #f87171;
+            font-weight: 500;
+        }
+
+        .recording-status .dot {
+            width: 10px;
+            height: 10px;
+            background: #f87171;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+            margin: 15px 0 30px;
+        }
+
+        .control-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            font-size: 1.8rem;
+        }
+
+        .record-btn {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .record-btn.recording {
+            animation: pulse-record 1.5s infinite;
+        }
+
+        @keyframes pulse-record {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .stop-btn {
+            background: linear-gradient(135deg, #64748b, #475569);
+            color: white;
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .recordings-section {
+            padding: 20px 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+        }
+
+        .recording-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .recording-item {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .recording-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .recording-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(56, 189, 248, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: #38bdf8;
+            font-size: 1.2rem;
+        }
+
+        .recording-info {
+            flex: 1;
+        }
+
+        .recording-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .recording-details {
+            display: flex;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .recording-duration {
+            margin-right: 15px;
+        }
+
+        .recording-date {
+            font-size: 0.85rem;
+        }
+
+        .recording-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #38bdf8;
+            width: 45%;
+            border-radius: 3px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 20px;
+            }
+
+            header {
+                padding: 20px 15px;
+            }
+
+            .recorder-section {
+                padding: 20px 15px;
+            }
+
+            .visualizer {
+                height: 120px;
+            }
+
+            .controls {
+                gap: 25px;
+            }
+
+            .control-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .record-btn {
+                width: 70px;
+                height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>录音应用</h1>
+        <div class="subtitle">简洁高效的录音工具</div>
+    </header>
+
+    <div class="recorder-section">
+        <div class="visualizer">
+            <div class="wave">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <div class="timer">00:45</div>
+        </div>
+
+        <div class="recording-status">
+            <div class="dot"></div>
+            <span>正在录音中...</span>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn stop-btn">
+                <i class="fas fa-stop"></i>
+            </button>
+            <button class="control-btn record-btn recording">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="control-btn play-btn">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="recordings-section">
+        <div class="section-title">
+            <i class="fas fa-list"></i>
+            <span>录音记录</span>
+        </div>
+
+        <div class="recording-list">
+            <div class="recording-item">
+                <div class="recording-icon">
+                    <i class="fas fa-file-audio"></i>
+                </div>
+                <div class="recording-info">
+                    <div class="recording-title">会议记录</div>
+                    <div class="progress-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="recording-details">
+                        <span class="recording-duration">02:45</span>
+                        <span class="recording-date">2023年10月15日</span>
+                    </div>
+                </div>
+                <div class="recording-actions">
+                    <div class="action-btn">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="action-btn">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recording-item">
+                <div class="recording-icon">
+                    <i class="fas fa-file-audio"></i>
+                </div>
+                <div class="recording-info">
+                    <div class="recording-title">采访录音</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 75%"></div>
+                    </div>
+                    <div class="recording-details">
+                        <span class="recording-duration">15:32</span>
+                        <span class="recording-date">2023年10月14日</span>
+                    </div>
+                </div>
+                <div class="recording-actions">
+                    <div class="action-btn">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="action-btn">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recording-item">
+                <div class="recording-icon">
+                    <i class="fas fa-file-audio"></i>
+                </div>
+                <div class="recording-info">
+                    <div class="recording-title">灵感笔记</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 30%"></div>
+                    </div>
+                    <div class="recording-details">
+                        <span class="recording-duration">01:15</span>
+                        <span class="recording-date">2023年10月12日</span>
+                    </div>
+                </div>
+                <div class="recording-actions">
+                    <div class="action-btn">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="action-btn">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 简单的录音可视化动画控制
+    const bars = document.querySelectorAll('.bar');
+    let isAnimating = true;
+
+    function animateBars() {
+        if (!isAnimating) return;
+
+        bars.forEach(bar => {
+            const height = Math.random() * 60 + 20;
+            bar.style.height = `${height}px`;
+        });
+
+        setTimeout(animateBars, 150);
+    }
+
+    // 控制录音按钮状态
+    const recordBtn = document.querySelector('.record-btn');
+    const recordingStatus = document.querySelector('.recording-status');
+
+    recordBtn.addEventListener('click', function() {
+        this.classList.toggle('recording');
+
+        if (this.classList.contains('recording')) {
+            recordingStatus.style.display = 'flex';
+            isAnimating = true;
+            animateBars();
+        } else {
+            recordingStatus.style.display = 'none';
+            isAnimating = false;
+        }
+    });
+
+    // 初始动画
+    animateBars();
+
+    // 录音列表操作
+    document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-play')) {
+                icon.classList.remove('fa-play');
+                icon.classList.add('fa-pause');
+                this.style.background = 'rgba(56, 189, 248, 0.3)';
+            } else if (icon.classList.contains('fa-pause')) {
+                icon.classList.remove('fa-pause');
+                icon.classList.add('fa-play');
+                this.style.background = '';
+            }
+        });
+    });
+</script>
+</body>
+</html>
